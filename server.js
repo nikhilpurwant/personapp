@@ -1,17 +1,24 @@
-var http = require("http");
+/*
+*   Either you can run as node/nodemon server.js
+*   Or if json-server is globally installed 
+*   json-server db.json --routes routes.json
+*   when running server.js routes are part of the API call to json server 
+*   and even db.json is included in the code
+*   This is running json server as a module within your app.
+*   for more go here https://github.com/typicode/json-server
+*/
+const jsonServer = require('json-server');
+const server = jsonServer.create();
+const router = jsonServer.router('db.json');
+const middlewares = jsonServer.defaults();
 
-var port = process.env.PORT || 3000;
+server.use(jsonServer.rewriter({
+    '/api/*': '/$1'
+}));
 
-http.createServer(function (request, response) {
-
-   // Send the HTTP header 
-   // HTTP Status: 200 : OK
-   // Content Type: text/plain
-   response.writeHead(200, {'Content-Type': 'text/plain'});
-   
-   // Send the response body as "Hello World"
-   response.end('Hello World\n');
-}).listen(port);
-
-// Console will print the message
-console.log(`Server running at http://127.0.0.1:${port}/`);
+server.use(middlewares)
+server.use(router)
+let port = process.env.PORT || 3000;
+server.listen(port, () => {
+    console.log(`JSON Server is running on ${port}`);
+})

@@ -1,0 +1,19 @@
+{
+  "persons": [
+    {
+      "id": "1",
+      "name": "John Doe",
+      "email": "john@aws.com"
+    },
+    {
+      "id": "2",
+      "name": "Jake",
+      "email": "jake@azure.com"
+    },
+    {
+      "id": "3",
+      "name": "Miranda",
+      "email": "miranda@gcp.com"
+    }
+  ]
+}

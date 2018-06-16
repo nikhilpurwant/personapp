@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Person Crud</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ -->
+ <link rel="stylesheet"
+	href="./css/bootstrap.min.css">
+<script
+	src="./js/jquery.min.js"></script>
+<script
+	src="./js/bootstrap.min.js"></script>
+ 
+ 	
+</head>
+<body>
+
+	<div class="container">
+		<h2>CRUD Person</h2>
+		<hr>
+		<form class="form-horizontal" id="crud_form">
+			<div class="form-group">
+				<label class="control-label col-sm-1" for="name">Id:</label>
+				<div class="col-sm-4">
+					<input type="id" class="form-control" name="id" id="id"
+						placeholder="Enter id">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label col-sm-1" for="name">Name:</label>
+				<div class="col-sm-4">
+					<input type="name" class="form-control" name="name" id="name"
+						placeholder="Enter name">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="control-label col-sm-1" for="email">Email:</label>
+				<div class="col-sm-4">
+					<input type="email" class="form-control" name="email" id="email"
+						placeholder="Enter email">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="col-sm-offset-1 col-sm-4">
+					<button type="button" class="btn btn-info" id="getById">Get/All</button>
+					<button type="button" class="btn btn-success" id="save">Save</button>
+					<button type="button" class="btn btn-success" id="update">Update</button>
+					<button type="button" class="btn btn-warning" id="delete">Delete</button>
+					<button type="button" class="btn btn-default" id="clear">Clear</button>
+				</div>
+			</div>
+		</form>
+		<h2>List</h2>
+		<hr>
+		<table class="table table-striped" id="listTable">
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Name</th>
+					<th>Email</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+
+	</div>
+
+
+	<script>
+$(document).ready(function() {
+
+	//form to object
+	$.fn.serializeObject = function()
+	{
+	   var o = {};
+	   var a = this.serializeArray();
+	   $.each(a, function() {
+	       if (o[this.name]) {
+	           if (!o[this.name].push) {
+	               o[this.name] = [o[this.name]];
+	           }
+	           o[this.name].push(this.value || '');
+	       } else {
+	           o[this.name] = this.value || '';
+	       }
+	   });
+	   return o;
+	};
+	
+	var updateTable = function(id,data){
+        var trHTML = '';
+		if (id.length != 0){
+            trHTML += '<tr><td>' + data.id + '</td><td>' + data.name 
+            + '</td><td>' + data.email + '</td>'+'</tr>';
+            $('#listTable tbody').html(trHTML);
+		}else{
+            $.each(data, function (i, person) {
+                trHTML += '<tr><td>' + person.id + '</td><td>' + person.name 
+                + '</td><td>' + person.email + '</td>'+ '</tr>';
+            });
+            $('#listTable tbody').html(trHTML);
+		}
+	};
+	
+	// separator was added for python api which treats /api/persons not same as /api/persons/
+	var getData=function(){
+		id = $('#id').val();
+		separator="/";
+		if (id.length == 0)
+		{
+			id="";		
+			separator="";
+		}
+		
+		$.ajax({
+			url: "/api/persons"+separator+id,
+	        type: "GET",
+	        data:null,
+	        contentType: 'application/json; charset=utf-8',
+
+	        success: function (a,b,c) {
+	        	console.log("Done Fetching Data");
+	        	//console.log(JSON.stringify(a));
+	        	updateTable(id,a);
+	        },
+	        error: function () {
+	        	console.log("Error Fetching Data");	        
+	        }
+	    });		
+	};	
+	
+	
+	var clearFields=function(){
+		$('#id').val("");
+		$('#name').val("");
+		$('#email').val("");
+	}
+	
+	//Save
+	$("#save").click(function(){
+		data = $('#crud_form').serializeObject()
+		console.log(JSON.stringify(data));
+		$.ajax({
+	        url: "/api/persons",
+	        type: "POST",
+	        data:JSON.stringify(data),
+	        contentType: 'application/json; charset=utf-8',
+	        success: function (a,b,c) {
+	        	console.log("Done Saving Data");
+	        	getData();
+	        },
+	        error: function () {
+	        	console.log("Error Saving Data");	        
+	        }
+	    });		
+	}
+	);
+	
+	
+	//Get
+	$("#getById").click(function(){getData()});	
+
+	//Update
+	$("#update").click(function(){
+		data = $('#crud_form').serializeObject()
+		id = $('#id').val()
+		$.ajax({
+	        url: "/api/persons/"+id,
+	        type: "PUT",
+	        data:JSON.stringify(data),
+	        contentType: 'application/json; charset=utf-8',
+	        success: function (a,b,c) {
+	        	console.log("Done Updating Data");
+	        	getData();
+	        },
+	        error: function () {
+	        	console.log("Error Updating Data");	        
+	        }
+	    });		
+	}
+	);	
+	
+	//Delete
+	$("#delete").click(function(){
+		id = $('#id').val()
+		$.ajax({
+			url: "/api/persons/"+id,
+	        type: "DELETE",
+	        data:null,
+	        contentType: 'application/json; charset=utf-8',
+	        success: function (a,b,c) {
+	        	console.log("Done Deleting Data");
+	        	$('#id').val("")
+	        	getData();
+	        },
+	        error: function () {
+	        	console.log("Error Deleting Data");	        
+	        }
+	    });		
+	}
+	);	
+
+
+	//Clear Fields
+	$("#clear").click(function(){
+		clearFields();
+	}
+	);	
+	
+	
+
+});
+
+</script>
+
+</body>
+</html>
