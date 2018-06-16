@@ -14,8 +14,8 @@ const router = jsonServer.router('db.json');
 const middlewares = jsonServer.defaults();
 
 // Add custom routes before JSON Server router
-server.get('/env', (req, res) => {
-    res.send({version:process.env.ENV||'UNKNOWN'});
+server.get('/api/env', (req, res) => {
+    res.send({env:process.env.ENV||'UNKNOWN'});
 })
 
 server.use(jsonServer.rewriter({

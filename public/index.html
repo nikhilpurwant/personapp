@@ -25,6 +25,7 @@
 
 	<div class="container">
 		<h2>CRUD Person</h2>
+				<h4>Current ENV : <b id="currentENV"></b></h4> <button id="detectENV" class="btn btn-info" type="button">Detect ENV</button>
 		<hr>
 		<form class="form-horizontal" id="crud_form">
 			<div class="form-group">
@@ -141,6 +142,26 @@ $(document).ready(function() {
 	    });		
 	};	
 	
+	var detectENVRESTCALL=function(){
+
+	$.ajax({
+		url: "/api/env",
+		type: "GET",
+		data:null,
+		contentType: 'application/json; charset=utf-8',
+
+		success: function (a,b,c) {
+			console.log("Done Fetching Data");
+			//console.log(JSON.stringify(a));
+			$("#currentENV").html(a.env);	
+		},
+		error: function (a) {
+			console.log("Error Fetching Data");	
+			$("#currentENV").html("Error Getting ENV Information");	
+
+		}
+	});		
+	};			
 	
 	var clearFields=function(){
 		$('#id').val("");
@@ -171,6 +192,7 @@ $(document).ready(function() {
 	
 	//Get
 	$("#getById").click(function(){getData()});	
+	$("#detectENV").click(function(){detectENVRESTCALL()});	
 
 	//Update
 	$("#update").click(function(){
@@ -227,3 +249,4 @@ $(document).ready(function() {
 
 </body>
 </html>
+
